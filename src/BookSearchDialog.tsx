@@ -1,6 +1,7 @@
-import React , {useState} from 'react';
+import React , {useState,useEffect} from 'react';
 import {BookDescription} from './BookDescription';
 import BookSearchItem from './BookSearchItem';
+import {buildSearchUrl,extractBooks} from './BookSearchService'
 
 type BookSearchDialogProps = {
     maxResults: number;
@@ -11,6 +12,24 @@ const BookSearchDialog = (props: BookSearchDialogProps) => {
     const [books,setBooks] = useState([] as BookDescription[]);
     const [title, setTitle] = useState("");
     const [author,setAuthor] = useState("");
+    const [isSearching, setIsSearching] = useState(false);
+
+    useEffect(()=>{
+        if(isSearching){
+            const url = buildSearchUrl(title,author,props.maxResults);
+            fetch(url)
+            .then(res => {
+                return res.json();
+            })
+            .then(json => {
+                setBooks(extractBooks(json));
+            })
+            .catch(err => {
+                console.log(err);
+            })
+        }
+        setIsSearching(false);
+    },[isSearching])
 
     const handleTitleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTitle(e.target.value);
@@ -26,6 +45,7 @@ const BookSearchDialog = (props: BookSearchDialogProps) => {
             return;
         }
         //検索処理
+        setIsSearching(true);
     }
 
     const handleBookAdd = (book: BookDescription) => {
