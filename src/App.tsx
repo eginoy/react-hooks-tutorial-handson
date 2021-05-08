@@ -1,6 +1,7 @@
 import React,{useState} from "react";
 import "./App.css";
 import { BookToRead } from "./BookToRead";
+import {BookDescription} from './BookDescription'
 import BookRow from  './BookRow';
 import Modal from 'react-modal';
 import BookSearchDialog from './BookSearchDialog'
@@ -44,7 +45,7 @@ const dummyBooks: BookToRead[] = [
 ];
 
 const App = () => {
-  const [books,setBooks] = useState(dummyBooks);
+  const [books,setBooks] = useState([] as BookToRead[]);
   const [modalIsOpen,setModalIsOpen] = useState(false);
 
   const handleAddClick = () => {
@@ -67,6 +68,13 @@ const App = () => {
   const handleDeleteClick = (id: number) => {
     const newBooks = books.filter(b => b.id !== id);
     setBooks(newBooks);
+  }
+
+  const handleBookAdd = (book: BookDescription) => {
+    const newBook: BookToRead = {...book,id: Date.now(), memo: ''}
+    const newBooks = [...books,newBook];
+    setBooks(newBooks);
+    setModalIsOpen(false);
   }
 
   const bookRows = books.map(b => {
@@ -93,7 +101,7 @@ const App = () => {
         onRequestClose={handleModalClose}
         style={customStyle}
       >
-        <BookSearchDialog maxResults={20} onBookAdd={(b) => {}} />
+        <BookSearchDialog maxResults={20} onBookAdd={(b) => handleBookAdd(b)} />
       </Modal>
     </div>
   );
