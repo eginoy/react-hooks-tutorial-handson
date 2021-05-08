@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React,{useState, useEffect} from "react";
 import "./App.css";
 import { BookToRead } from "./BookToRead";
 import {BookDescription} from './BookDescription'
@@ -23,30 +23,22 @@ const customStyle = {
   }
 }
 
-const dummyBooks: BookToRead[] = [
-  {
-    id: 1,
-    title: "はじめてのReact",
-    authors: "ダミー",
-    memo: ""
-  },
-  {
-    id: 2,
-    title: "React Hooks入門",
-    authors: "ダミー",
-    memo: ""
-  },
-  {
-    id: 3,
-    title: "実践Reactアプリケーション開発",
-    authors: "ダミー",
-    memo: ""
-  }
-];
+const APP_KEY = "react-hooks-tutorial";
 
 const App = () => {
   const [books,setBooks] = useState([] as BookToRead[]);
   const [modalIsOpen,setModalIsOpen] = useState(false);
+
+  useEffect(() => {
+    const storedBooks = localStorage.getItem(APP_KEY);
+    if(storedBooks){
+      setBooks(JSON.parse(storedBooks));
+    }
+  },[]);
+
+  useEffect(() => {
+    localStorage.setItem(APP_KEY,JSON.stringify(books));
+  },[books]);
 
   const handleAddClick = () => {
     setModalIsOpen(true);
