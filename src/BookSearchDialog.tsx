@@ -1,7 +1,7 @@
 import React , {useState,useEffect,useRef} from 'react';
 import {BookDescription} from './BookDescription';
 import BookSearchItem from './BookSearchItem';
-import {buildSearchUrl,extractBooks} from './BookSearchService'
+import { useBookData } from './useBookData';
 
 type BookSearchDialogProps = {
     maxResults: number;
@@ -9,39 +9,23 @@ type BookSearchDialogProps = {
 }
 
 const BookSearchDialog = (props: BookSearchDialogProps) => {
-    const [books,setBooks] = useState([] as BookDescription[]);
     const titleRef = useRef<HTMLInputElement>(null);
     const authorRef = useRef<HTMLInputElement>(null);
-    const [isSearching, setIsSearching] = useState(false);
-
+    const [title,setTitle] = useState('');
+    const [author,setAuthor] = useState('');
+    const books = useBookData(title,author,props.maxResults);
+    
     useEffect(() => {
        titleRef.current?.focus();
     },[])
-
-    useEffect(()=>{
-        if(isSearching){
-            const url = buildSearchUrl(titleRef.current!.value,authorRef.current!.value,props.maxResults);
-            fetch(url)
-            .then(res => {
-                return res.json();
-            })
-            .then(json => {
-                setBooks(extractBooks(json));
-            })
-            .catch(err => {
-                console.log(err);
-            })
-        }
-        setIsSearching(false);
-    },[isSearching])
 
     const handleSearchClick = () =>{
         if(!titleRef.current!.value && !authorRef.current!.value){
             alert('検索条件を入力してください。')
             return;
         }
-        //検索処理
-        setIsSearching(true);
+        setTitle(titleRef.current!.value);
+        setAuthor(authorRef.current!.value);
     }
 
     const handleBookAdd = (book: BookDescription) => {
